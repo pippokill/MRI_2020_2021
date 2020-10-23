@@ -57,7 +57,7 @@ public class HelloWorld {
             //Create the query parser with the default field and analyzer
             QueryParser qp = new QueryParser("name", new StandardAnalyzer());
             //Parse the query
-            Query q = qp.parse("name:parker powers:agility");
+            Query q = qp.parse("peter powers:agility");
             //Search
             TopDocs topdocs = searcher.search(q, 10);
             System.out.println("Found " + topdocs.totalHits.value + " document(s).");
