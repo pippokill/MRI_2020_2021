@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath di.uniba.it.mri2021.tika.TikaExample /home/pierpaolo/Scaricati/NL4AI__A_comparative_study_of_approaches_for_the_diachronic_analysis_of_Italian_language.pdf</exec.args>
+                <exec.args>-classpath %classpath di.uniba.it.mri2021.lucene.se.SearchSE resources/text_idx "re*"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath di.uniba.it.mri2021.tika.TikaExample /home/pierpaolo/Scaricati/NL4AI__A_comparative_study_of_approaches_for_the_diachronic_analysis_of_Italian_language.pdf</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath di.uniba.it.mri2021.lucene.se.SearchSE resources/text_idx "re*"</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath di.uniba.it.mri2021.tika.TikaExample /home/pierpaolo/Scaricati/NL4AI__A_comparative_study_of_approaches_for_the_diachronic_analysis_of_Italian_language.pdf</exec.args>
+                <exec.args>-classpath %classpath di.uniba.it.mri2021.lucene.se.SearchSE resources/text_idx "re*"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

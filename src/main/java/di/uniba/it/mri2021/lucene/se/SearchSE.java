@@ -39,7 +39,7 @@ public class SearchSE {
             //Search
             TopDocs topdocs = searcher.search(q, 10);
             for (ScoreDoc sdoc : topdocs.scoreDocs) {
-                System.out.println("Found doc, path=" + searcher.doc(sdoc.doc).get("id") + ", score" + sdoc.score);
+                System.out.println("Found doc, path=" + searcher.doc(sdoc.doc).get("id") + ", score " + sdoc.score);
             }
         }
     }

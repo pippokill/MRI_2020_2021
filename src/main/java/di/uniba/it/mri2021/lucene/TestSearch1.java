@@ -35,7 +35,7 @@ public class TestSearch1 {
         //Boolean query
         BooleanQuery.Builder qb = new BooleanQuery.Builder();
         qb.add(new TermQuery(new Term("name", "parker")), BooleanClause.Occur.SHOULD);
-        qb.add(new TermQuery(new Term("powers", "agility")), BooleanClause.Occur.SHOULD);
+        qb.add(new TermQuery(new Term("powers", "agility")), BooleanClause.Occur.MUST_NOT);
         Query q = qb.build();
         TopDocs topdocs = searcher.search(q, 10);
         System.out.println("Found " + topdocs.totalHits.value + " document(s).");
