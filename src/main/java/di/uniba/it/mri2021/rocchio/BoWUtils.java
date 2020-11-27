@@ -5,8 +5,11 @@
  */
 package di.uniba.it.mri2021.rocchio;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,6 +71,21 @@ public class BoWUtils {
         }
     }
 
+    public static List<TermEntry> getTopTerms(BoW bow, int k) {
+        List<TermEntry> list = new ArrayList<>();
+        Iterator<Map.Entry<String, Float>> entries = bow.getEntriesIterator();
+        while (entries.hasNext()) {
+            Map.Entry<String, Float> e = entries.next();
+            list.add(new TermEntry(e.getKey(), e.getValue()));
+        }
+        Collections.sort(list, Collections.reverseOrder());
+        if (k < list.size()) {
+            return list.subList(0, k);
+        } else {
+            return list;
+        }
+    }
+
     public static void main(String[] args) {
         BoW bow1 = new BoW();
         bow1.putWord("a", 0.43f);
@@ -84,5 +102,6 @@ public class BoWUtils {
         scalarProduct(0.5f, abow);
         System.out.println(abow);
         System.out.println(sim(bow1, bow2));
+        System.out.println(getTopTerms(abow, 3));
     }
 }
