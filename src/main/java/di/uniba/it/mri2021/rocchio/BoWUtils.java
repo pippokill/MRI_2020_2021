@@ -19,7 +19,7 @@ import java.util.Set;
  */
 public class BoWUtils {
 
-    //costruisce il centroide
+    // built the centroid
     public static BoW average(BoW... bows) {
         BoW c = new BoW();
         for (BoW bow : bows) {
@@ -40,6 +40,22 @@ public class BoWUtils {
         }
         return c;
     }
+    
+    public static BoW add(BoW... bows) {
+        BoW c = new BoW();
+        for (BoW bow : bows) {
+            Set<String> words = bow.getWords();
+            for (String word : words) {
+                Float w = c.getWeight(word);
+                if (w == null) {
+                    c.putWord(word, bow.getWeight(word));
+                } else {
+                    c.putWord(word, w + bow.getWeight(word));
+                }
+            }
+        }
+        return c;
+    }
 
     public static float norma2(BoW bow) {
         double n = 0;
@@ -49,6 +65,11 @@ public class BoWUtils {
             n += Math.pow(e.getValue(), 2);
         }
         return (float) Math.sqrt(n);
+    }
+
+    public static void normalize(BoW bow) {
+        float norma = norma2(bow);
+        scalarProduct(1 / norma, bow);
     }
 
     //calcola la similarità del coseno tra due BoW

@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath di.uniba.it.mri2021.lucene.cran.ex3.CranIndexer ./resources/cran/cran.all.1400.json ./resources/cran/index</exec.args>
+                <exec.args>-classpath %classpath di.uniba.it.mri2021.tika.TikaIndexer "/home/pierpaolo/Documenti/Dottorato di ricerca/biblioteca/WSD" resources/tika_idx tv</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath di.uniba.it.mri2021.lucene.cran.ex3.CranIndexer ./resources/cran/cran.all.1400.json ./resources/cran/index</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath di.uniba.it.mri2021.tika.TikaIndexer "/home/pierpaolo/Documenti/Dottorato di ricerca/biblioteca/WSD" resources/tika_idx tv</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath di.uniba.it.mri2021.lucene.cran.ex3.CranIndexer ./resources/cran/cran.all.1400.json ./resources/cran/index</exec.args>
+                <exec.args>-classpath %classpath di.uniba.it.mri2021.tika.TikaIndexer "/home/pierpaolo/Documenti/Dottorato di ricerca/biblioteca/WSD" resources/tika_idx tv</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

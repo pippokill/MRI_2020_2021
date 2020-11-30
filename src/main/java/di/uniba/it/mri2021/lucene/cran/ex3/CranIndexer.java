@@ -14,6 +14,7 @@ import java.io.IOException;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
@@ -31,6 +32,9 @@ public class CranIndexer {
      */
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
+            // Store TermVectors for Rocchio
+            FieldType ft = new FieldType(TextField.TYPE_NOT_STORED);
+            ft.setStoreTermVectors(true);
             FSDirectory fsdir = FSDirectory.open(new File(args[1]).toPath());
             IndexWriterConfig iwc = new IndexWriterConfig(new StandardAnalyzer());
             iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
@@ -41,8 +45,8 @@ public class CranIndexer {
                 CranDocument crandoc = gson.fromJson(reader.readLine(), CranDocument.class);
                 Document doc = new Document();
                 doc.add(new StringField("id", crandoc.getId(), Field.Store.YES));
-                doc.add(new TextField("title", crandoc.getTitle(), Field.Store.NO));
-                doc.add(new TextField("text", crandoc.getText(), Field.Store.NO));
+                doc.add(new Field("title", crandoc.getTitle(), ft));
+                doc.add(new Field("text", crandoc.getText(), ft));
                 writer.addDocument(doc);
             }
             writer.close();
