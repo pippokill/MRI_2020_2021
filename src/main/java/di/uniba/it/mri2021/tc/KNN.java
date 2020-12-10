@@ -21,7 +21,7 @@ public class KNN extends TextCategorization {
 
     private final int k;
 
-    private List<DatasetExample> trainingset;
+    private List<DatasetExample> trainingset = null;
 
     public KNN(int k) {
         this.k = k;
@@ -35,6 +35,9 @@ public class KNN extends TextCategorization {
 
     @Override
     public List<String> test(List<DatasetExample> testingset) throws IOException {
+        if (trainingset == null) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
         List<String> p = new ArrayList<>();
         int c = 0;
         for (DatasetExample etest : testingset) {

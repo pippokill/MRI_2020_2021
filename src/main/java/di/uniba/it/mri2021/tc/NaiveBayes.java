@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- *
+ * Naive Bayes with Laplace smoothing
  * @author pierpaolo
  */
 public class NaiveBayes extends TextCategorization {
