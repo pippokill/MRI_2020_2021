@@ -41,8 +41,8 @@ public class Rocchio extends TextCategorization {
         for (String category : categories) {
             centroids.put(category, new BoW());
             centroidsNeg.put(category, new BoW());
-            count.put(category, 1);
-            countNeg.put(category, 1);
+            count.put(category, 0);
+            countNeg.put(category, 0);
         }
         int i = 0;
         for (DatasetExample e : trainingset) {
