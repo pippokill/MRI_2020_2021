@@ -25,6 +25,7 @@ public class TestTC {
         List<DatasetExample> traingset = tr.getExamples(new File("resources/TC/train.csv"));
         DatasetReader ts = new CSVDatasetReader();
         List<DatasetExample> testset = ts.getExamples(new File("resources/TC/test.csv"));
+
         // Dummy       
         TextCategorization dummy = new DummyClassifier();
         dummy.train(traingset);

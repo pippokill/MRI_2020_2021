@@ -5,6 +5,7 @@
  */
 package di.uniba.it.mri2021.rocchio;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -42,11 +43,17 @@ public class BoW {
         return bow.entrySet().iterator();
     }
 
+    public Collection<Float> getWeights() {
+        return bow.values();
+    }
+    
+    public int size() {
+        return bow.size();
+    }
+
     @Override
     public String toString() {
         return "BoW{" + "bow=" + bow + '}';
     }
-    
-    
 
 }
