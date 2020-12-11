@@ -60,7 +60,7 @@ public class KNN extends TextCategorization {
             Collections.sort(out, Collections.reverseOrder());
             p.add(out.get(0).getCategory());
             c++;
-            if (c % 100 == 0) {
+            if (c % 1000 == 0) {
                 System.out.println("KNN testing " + c + "/" + testingset.size());
             }
         }

@@ -8,6 +8,7 @@ package di.uniba.it.mri2021.tc;
 import di.uniba.it.mri2021.rocchio.BoW;
 import di.uniba.it.mri2021.rocchio.BoWUtils;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,57 +23,83 @@ import java.util.stream.Collectors;
  */
 public class NaiveBayes extends TextCategorization {
 
-    private Map<String, BoW> m = null;
+    private Map<String, BoW> probCond = null;
 
     private Map<String, Double> priors = null;
 
+    private Set<String> vocabulary;
+
+    private Map<String, Double> totOcc = null;
+
+    private double trainingSize = 0;
+
     @Override
     public void train(List<DatasetExample> trainingset) throws IOException {
-        m = new HashMap<>();
+        probCond = new HashMap<>();
         priors = new HashMap<>();
-        // build categories set
-        Set<String> categories = trainingset.stream().map(e -> e.getCategory()).collect(Collectors.toSet());
-        // init structures
-        for (String category : categories) {
-            m.put(category, new BoW());
-            priors.put(category, 0d);
-        }
         // build BoW for each categories
         int i = 0;
         for (DatasetExample e : trainingset) {
-            BoW b = BoWUtils.add(m.get(e.getCategory()), e.getBow());
-            m.put(e.getCategory(), b);
-            // count classes
+            BoW b = probCond.get(e.getCategory());
+            if (b == null) {
+                probCond.put(e.getCategory(), new BoW());
+                priors.put(e.getCategory(), 0d);
+            }
+            b = BoWUtils.add(probCond.get(e.getCategory()), e.getBow());
+            probCond.put(e.getCategory(), b);
+            // count class occurrences
             priors.put(e.getCategory(), priors.get(e.getCategory()) + 1);
             i++;
-            System.out.println("[NaiveBayes] Training...(" + i + "/" + trainingset.size() + ")");
+            if (i % 1000 == 0) {
+                System.out.println("[NaiveBayes] Training...(" + i + "/" + trainingset.size() + ")");
+            }
         }
-        Set<String> vocabulary = new HashSet<>();
-        for (BoW words : m.values()) {
+        vocabulary = new HashSet<>();
+        for (BoW words : probCond.values()) {
             vocabulary.addAll(words.getWords());
         }
         System.out.println("[NaiveBayes] Vocabulary size: " + vocabulary.size());
         System.out.println("[NaiveBayes] Compute probabilities...");
-        // compute probabilities
+        totOcc = new HashMap<>();
+        // compute total occurrences for each class
         for (String key : priors.keySet()) {
-            // prior probabilities
-            priors.put(key, priors.get(key) / (float) trainingset.size());
-            // cond. probabilities
-            BoW cbow = m.get(key);
-            float tot = 0;
-            for (float w : cbow.getWeights()) {
-                tot += w;
-            }
-            for (String word : cbow.getWords()) {
-                float prob = (cbow.getWeight(word) + 1f) / (float) (tot + vocabulary.size());
-                cbow.putWord(word, prob);
-            }
+            totOcc.put(key, probCond.get(key).getWeights().stream().mapToDouble(v -> v).sum());
         }
+        trainingSize = trainingset.size();
     }
 
     @Override
     public List<String> test(List<DatasetExample> testingset) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (priors == null) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+        List<String> p = new ArrayList<>(testingset.size());
+        int i = 0;
+        for (DatasetExample e : testingset) {
+            Double max = null;
+            String cmax = "";
+            for (String c : priors.keySet()) {
+                double prob = Math.log(priors.get(c) / trainingSize);
+                for (String k : e.getBow().getWords()) {
+                    Float pt = probCond.get(c).getWeight(k);
+                    if (pt == null && vocabulary.contains(k)) {
+                        prob += Math.log(1 / (totOcc.get(c) + (double) vocabulary.size()));
+                    } else if (pt != null) {
+                        prob += Math.log((pt.doubleValue() + 1) / (totOcc.get(c) + (double) vocabulary.size()));
+                    }
+                }
+                if (max == null || prob > max) {
+                    max = prob;
+                    cmax = c;
+                }
+            }
+            p.add(cmax);
+            i++;
+            if (i % 1000 == 0) {
+                System.out.println("[NaiveBayes] Testing...(" + i + "/" + testingset.size() + ")");
+            }
+        }
+        return p;
     }
 
 }

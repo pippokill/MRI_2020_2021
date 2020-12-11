@@ -23,77 +23,69 @@ public class Rocchio extends TextCategorization {
 
     private Map<String, BoW> centroids = null;
 
-    private float alpha = 0.5f;
+    private float alpha = 0.8f;
 
-    private float beta = 0.5f;
+    private float beta = 0.2f;
 
     @Override
     public void train(List<DatasetExample> trainingset) throws IOException {
         centroids = new HashMap<>();
         // count vectors in positive example
         Map<String, Integer> count = new HashMap<>();
-        // structures for negative vectors
-        Map<String, Integer> countNeg = new HashMap<>();
-        Map<String, BoW> centroidsNeg = new HashMap<>();
-        // build categories set
-        Set<String> categories = trainingset.stream().map(e -> e.getCategory()).collect(Collectors.toSet());
-        // init structures
-        for (String category : categories) {
-            centroids.put(category, new BoW());
-            centroidsNeg.put(category, new BoW());
-            count.put(category, 0);
-            countNeg.put(category, 0);
-        }
         int i = 0;
         for (DatasetExample e : trainingset) {
-            for (String cat : centroids.keySet()) {
-                // positive vector
-                if (cat.equals(e.getCategory())) {
-                    BoW c = centroids.get(cat);
-                    centroids.put(cat, BoWUtils.add(c, e.getBow()));
-                    count.put(cat, count.get(cat) + 1);
-                } else { // negative vector
-                    BoW c = centroidsNeg.get(cat);
-                    centroidsNeg.put(cat, BoWUtils.add(c, e.getBow()));
-                    countNeg.put(cat, count.get(cat) + 1);
-                }
+            BoW c = centroids.get(e.getCategory());
+            if (c == null) {
+                c = new BoW();
+                count.put(e.getCategory(), 0);
             }
+            centroids.put(e.getCategory(), BoWUtils.add(c, e.getBow()));
+            count.put(e.getCategory(), count.get(e.getCategory()) + 1);
             i++;
-            if (i % 100 == 0) {
+            if (i % 1000 == 0) {
                 System.out.println("[Rocchio] Training...(" + i + "/" + trainingset.size() + ")");
             }
         }
-        // finalize negative centroids
-        for (String c : centroidsNeg.keySet()) {
-            BoWUtils.scalarProduct(-beta / countNeg.get(c).floatValue(), centroidsNeg.get(c));
-        }
+        System.out.println("[Rocchio] Centroids building...");
         // finalize centroids
+        Map<String, BoW> negativeCentroids = new HashMap<>();
+        for (String c : centroids.keySet()) {
+            BoW cneg = new BoW();
+            for (String c1 : centroids.keySet()) {
+                if (!c1.equals(c)) {
+                    cneg = BoWUtils.add(cneg, centroids.get(c1));
+                }
+            }
+            BoWUtils.scalarProduct(-beta / ((float) trainingset.size() - count.get(c).floatValue()), cneg);
+            negativeCentroids.put(c, cneg);
+        }
         for (String c : centroids.keySet()) {
             BoWUtils.scalarProduct(alpha / count.get(c).floatValue(), centroids.get(c));
-            BoW p = BoWUtils.add(centroids.get(c), centroidsNeg.get(c));
+            BoW p = BoWUtils.add(centroids.get(c), negativeCentroids.get(c));
             centroids.put(c, p);
         }
     }
 
     @Override
     public List<String> test(List<DatasetExample> testingset) throws IOException {
-        if (centroids==null)
+        if (centroids == null) {
             throw new UnsupportedOperationException("No training data.");
+        }
         List<String> p = new ArrayList<>();
         int i = 0;
         for (DatasetExample e : testingset) {
             String cat = "";
-            float maxsim = -1;
+            Float maxsim = null;
             for (String c : centroids.keySet()) {
                 float sim = BoWUtils.sim(centroids.get(c), e.getBow());
-                if (sim > maxsim) {
+                if (maxsim == null || sim > maxsim) {
                     maxsim = sim;
                     cat = c;
                 }
             }
             p.add(cat);
             i++;
-            if (i % 100 == 0) {
+            if (i % 1000 == 0) {
                 System.out.println("[Rocchio] Testing...(" + i + "/" + testingset.size() + ")");
             }
         }
