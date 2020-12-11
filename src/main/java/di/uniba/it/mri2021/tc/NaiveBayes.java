@@ -59,8 +59,12 @@ public class NaiveBayes extends TextCategorization {
             priors.put(key, priors.get(key) / (float) trainingset.size());
             // cond. probabilities
             BoW cbow = m.get(key);
+            float tot = 0;
+            for (float w : cbow.getWeights()) {
+                tot += w;
+            }
             for (String word : cbow.getWords()) {
-                float prob = (cbow.getWeight(word) + 1f) / (float) (cbow.size() + vocabulary.size());
+                float prob = (cbow.getWeight(word) + 1f) / (float) (tot + vocabulary.size());
                 cbow.putWord(word, prob);
             }
         }
