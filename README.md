@@ -13,3 +13,4 @@ Descrizione dei package:
 * *di.uniba.it.mri2021.rocchio*: Algoritmo di rocchio per lo pseudo-relevance feedback
 * *di.uniba.it.mri2021.tc*: Esempi/esercizi sul Text Categorization
 * *di.uniba.it.mri2021.tika*: Utilizzo dell'API Tika, Tika+Lucene
+* *di.uniba.it.mri2021.filtering*: Information Filtering
