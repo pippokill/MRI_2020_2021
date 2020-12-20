@@ -93,6 +93,7 @@ public class Movielens implements IFDataset {
                     split[2].split("\\|")));
         }
         reader.close();
+        System.out.println("Loaded " + items.size() + " movies.");
     }
 
     private void loadRatings(File file) throws IOException {
@@ -108,6 +109,7 @@ public class Movielens implements IFDataset {
                     Long.parseLong(split[3])));
         }
         reader.close();
+        System.out.println("Loaded " + ratings.size() + " ratings.");
     }
 
     private void loadUsers(File file) throws IOException {
@@ -122,6 +124,7 @@ public class Movielens implements IFDataset {
                     split[4]));
         }
         reader.close();
+        System.out.println("Loaded " + users.size() + " users.");
     }
 
 }

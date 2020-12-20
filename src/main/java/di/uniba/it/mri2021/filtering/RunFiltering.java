@@ -25,14 +25,40 @@ public class RunFiltering {
         try {
             IFDataset d = new Movielens();
             d.load(new File("resources/IF/ml-1m/"));
-            CollaborativeIF user2user = new UserBasedIF(d);
-            List<ItemPrediction> predictions = user2user.getPredictions(new User("2"));
+            CollaborativeIF userBased = new UserBasedIF(d);
+            String userId = "3162";
+            System.out.println("Recommendations for user " + userId);
+            long time = System.currentTimeMillis();
+            List<ItemPrediction> predictions = userBased.getPredictions(new User(userId));
             Map<String, Item> itemsMap = IFDatasetUtils.itemListToMap(d.getItems());
-            int top = 10;
+            int top = 20;
             for (int i = 0; i < top && i < predictions.size(); i++) {
                 Movie movie = (Movie) itemsMap.get(predictions.get(i).getItemid());
                 System.out.println(movie.getTitle() + "\t" + predictions.get(i).getScore());
             }
+            System.out.println("Time: " + (System.currentTimeMillis() - time));
+
+            userId = "1";
+            predictions = userBased.getPredictions(new User(userId));
+            System.out.println("Recommendations for user " + userId);
+            time = System.currentTimeMillis();
+            itemsMap = IFDatasetUtils.itemListToMap(d.getItems());
+            for (int i = 0; i < top && i < predictions.size(); i++) {
+                Movie movie = (Movie) itemsMap.get(predictions.get(i).getItemid());
+                System.out.println(movie.getTitle() + "\t" + predictions.get(i).getScore());
+            }
+            System.out.println("Time: " + (System.currentTimeMillis() - time));
+            
+            userId = "2164";
+            predictions = userBased.getPredictions(new User(userId));
+            System.out.println("Recommendations for user " + userId);
+            time = System.currentTimeMillis();
+            itemsMap = IFDatasetUtils.itemListToMap(d.getItems());
+            for (int i = 0; i < top && i < predictions.size(); i++) {
+                Movie movie = (Movie) itemsMap.get(predictions.get(i).getItemid());
+                System.out.println(movie.getTitle() + "\t" + predictions.get(i).getScore());
+            }
+            System.out.println("Time: " + (System.currentTimeMillis() - time));
         } catch (IOException ex) {
             Logger.getLogger(RunFiltering.class.getName()).log(Level.SEVERE, null, ex);
         }

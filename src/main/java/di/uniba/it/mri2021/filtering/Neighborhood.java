@@ -16,6 +16,8 @@ public class Neighborhood implements Comparable<Neighborhood> {
     private String id;
 
     private double score;
+    
+    private int rating;
 
     public Neighborhood() {
     }
@@ -24,6 +26,14 @@ public class Neighborhood implements Comparable<Neighborhood> {
         this.id = id;
         this.score = score;
     }
+
+    public Neighborhood(String id, double score, int rating) {
+        this.id = id;
+        this.score = score;
+        this.rating = rating;
+    }
+    
+    
 
     public String getId() {
         return id;
@@ -47,6 +57,16 @@ public class Neighborhood implements Comparable<Neighborhood> {
         hash = 97 * hash + Objects.hashCode(this.id);
         return hash;
     }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+    
+    
 
     @Override
     public boolean equals(Object obj) {

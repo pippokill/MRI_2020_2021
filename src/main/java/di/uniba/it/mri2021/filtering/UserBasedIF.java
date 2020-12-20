@@ -59,7 +59,7 @@ public class UserBasedIF extends CollaborativeIF {
         if (r1 == null || r2 == null) {
             throw new Exception("No ratings");
         }
-        List<Rating> co = IFDatasetUtils.coRatedItems(r1, r2);
+        List<String> co = IFDatasetUtils.coRatedItems(r1, r2);
         if (co.isEmpty()) {
             return 0;
         } else {
@@ -71,10 +71,10 @@ public class UserBasedIF extends CollaborativeIF {
             double c = 0;
             double n1 = 0;
             double n2 = 0;
-            for (Rating r : co) {
-                c += (m1.get(r.getItemId()).doubleValue() - ar1) * (m2.get(r.getItemId()).doubleValue() - ar2);
-                n1 += Math.pow(m1.get(r.getItemId()).doubleValue() - ar1, 2);
-                n2 += Math.pow(m2.get(r.getItemId()).doubleValue() - ar2, 2);
+            for (String r : co) {
+                c += (m1.get(r).doubleValue() - ar1) * (m2.get(r).doubleValue() - ar2);
+                n1 += Math.pow(m1.get(r).doubleValue() - ar1, 2);
+                n2 += Math.pow(m2.get(r).doubleValue() - ar2, 2);
             }
             if (n1 == 0 || n2 == 0) { // check denominator
                 return 0;
@@ -91,16 +91,13 @@ public class UserBasedIF extends CollaborativeIF {
         if (ratings != null) {
             List<Neighborhood> neigh = new ArrayList<>();
             for (Rating r : ratings) {
-                if (!r.getUserId().equals(user.getUserId())) {
-                    try {
-                        double c = pearsonCorrelation(user.getUserId(), r.getUserId());
-                        // transform correlation in similarity
-                        double sim = (1 + c) / 2;
-                        neigh.add(new Neighborhood(r.getUserId(), sim));
-                    } catch (Exception ex) {
-                        Logger.getLogger(UserBasedIF.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
+                try {
+                    double c = pearsonCorrelation(user.getUserId(), r.getUserId());
+                    // transform correlation in similarity
+                    double sim = (1 + c) / 2;
+                    neigh.add(new Neighborhood(r.getUserId(), sim, r.getRating()));
+                } catch (Exception ex) {
+                    Logger.getLogger(UserBasedIF.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             // get k neighborhoods
@@ -113,19 +110,9 @@ public class UserBasedIF extends CollaborativeIF {
             double n = 0;
             double d = 0;
             for (Neighborhood nu : neigh) {
-                List<Rating> nuRatings = ratingsByUser.get(nu.getId());
-                Integer itemScore = null;
-                for (Rating nur : nuRatings) {
-                    if (nur.getItemId().equals(item.getItemID())) {
-                        itemScore = nur.getRating();
-                        break;
-                    }
-                }
-                if (itemScore != null) {
-                    double avg = getAverageScore(nu.getId());
-                    n += nu.getScore() * (itemScore.doubleValue() - avg);
-                    d += nu.getScore();
-                }
+                double avg = getAverageScore(nu.getId());
+                n += nu.getScore() * ((double) nu.getRating() - avg);
+                d += nu.getScore();
             }
             if (d != 0) {
                 return p + (n / d);
@@ -141,7 +128,8 @@ public class UserBasedIF extends CollaborativeIF {
     public List<ItemPrediction> getPredictions(User user) {
         List<ItemPrediction> predictions = new ArrayList<>();
         // get items rated by the user and map them
-        Map<String, Integer> ratingsToMap = IFDatasetUtils.ratingsToMapByItem(ratingsByUser.get(user.getUserId()));
+        List<Rating> userRatings = ratingsByUser.get(user.getUserId());
+        Map<String, Integer> ratingsToMap = IFDatasetUtils.ratingsToMapByItem(userRatings);
         for (Item item : getDataset().getItems()) {
             // for each item not rated by the user
             if (!ratingsToMap.containsKey(item.getItemID())) {

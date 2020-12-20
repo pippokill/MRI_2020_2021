@@ -64,18 +64,17 @@ public class IFDatasetUtils {
         return ratings.stream().mapToDouble(r -> r.getRating()).average().getAsDouble();
     }
 
-    public static List<Rating> coRatedItems(List<Rating> ratings1, List<Rating> ratings2) {
-        Set<String> ids = new HashSet<>();
-        List<Rating> l = new ArrayList<>();
+    public static List<String> coRatedItems(List<Rating> ratings1, List<Rating> ratings2) {
+        Set<String> ids1 = new HashSet<>();
         for (Rating r1 : ratings1) {
-            ids.add(r1.getItemId());
+            ids1.add(r1.getItemId());
         }
+        Set<String> ids2 = new HashSet<>();
         for (Rating r2 : ratings2) {
-            if (ids.contains(r2.getItemId())) {
-                l.add(r2);
-            }
+            ids2.add(r2.getItemId());
         }
-        return l;
+        ids1.retainAll(ids2);
+        return new ArrayList<>(ids1);
     }
 
     public static Map<String, Integer> ratingsToMapByItem(List<Rating> ratings) {
