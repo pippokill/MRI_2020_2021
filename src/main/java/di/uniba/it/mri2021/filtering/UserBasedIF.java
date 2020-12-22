@@ -27,6 +27,8 @@ public class UserBasedIF extends CollaborativeIF {
 
     private Map<String, Double> averageScore = null;
 
+    private boolean cosine = false;
+
     public UserBasedIF(IFDataset dataset) {
         super(dataset);
         ratingsByUser = IFDatasetUtils.getRatingsByUser(dataset.getRatings());
@@ -35,12 +37,29 @@ public class UserBasedIF extends CollaborativeIF {
         averageScore = new HashMap<>();
     }
 
+    public UserBasedIF(IFDataset dataset, boolean cosine) {
+        super(dataset);
+        ratingsByUser = IFDatasetUtils.getRatingsByUser(dataset.getRatings());
+        ratingsByItem = IFDatasetUtils.getRatingsByItem(dataset.getRatings());
+        // store users average score
+        averageScore = new HashMap<>();
+        this.cosine = cosine;
+    }
+
     public int getK() {
         return k;
     }
 
     public void setK(int k) {
         this.k = k;
+    }
+
+    public boolean isCosine() {
+        return cosine;
+    }
+
+    public void setCosine(boolean cosine) {
+        this.cosine = cosine;
     }
 
     private double getAverageScore(String userid) {
@@ -61,7 +80,7 @@ public class UserBasedIF extends CollaborativeIF {
         }
         List<String> co = IFDatasetUtils.coRatedItems(r1, r2);
         if (co.isEmpty()) {
-            return 0;
+            return -1;
         } else {
             // compute Pearson correlation
             Map<String, Integer> m1 = IFDatasetUtils.ratingsToMapByItem(r1);
@@ -84,6 +103,36 @@ public class UserBasedIF extends CollaborativeIF {
         }
     }
 
+    public double cosine(String userId1, String userId2) throws Exception {
+        // find co-rated items
+        List<Rating> r1 = ratingsByUser.get(userId1);
+        List<Rating> r2 = ratingsByUser.get(userId2);
+        if (r1 == null || r2 == null) {
+            throw new Exception("No ratings");
+        }
+        List<String> co = IFDatasetUtils.coRatedItems(r1, r2);
+        if (co.isEmpty()) {
+            return 0;
+        } else {
+            // compute Pearson correlation
+            Map<String, Integer> m1 = IFDatasetUtils.ratingsToMapByItem(r1);
+            Map<String, Integer> m2 = IFDatasetUtils.ratingsToMapByItem(r2);
+            double c = 0;
+            double n1 = 0;
+            double n2 = 0;
+            for (String r : co) {
+                c += m1.get(r).doubleValue() * m2.get(r).doubleValue();
+                n1 += Math.pow(m1.get(r).doubleValue(), 2);
+                n2 += Math.pow(m2.get(r).doubleValue(), 2);
+            }
+            if (n1 == 0 || n2 == 0) { // check denominator
+                return 0;
+            } else {
+                return c / (Math.sqrt(n1) * Math.sqrt(n2));
+            }
+        }
+    }
+
     @Override
     public double getPrediction(User user, Item item) {
         // get users that rated the item
@@ -92,9 +141,14 @@ public class UserBasedIF extends CollaborativeIF {
             List<Neighborhood> neigh = new ArrayList<>();
             for (Rating r : ratings) {
                 try {
-                    double c = pearsonCorrelation(user.getUserId(), r.getUserId());
-                    // transform correlation in similarity
-                    double sim = (1 + c) / 2;
+                    double sim;
+                    if (cosine) {
+                        sim = cosine(user.getUserId(), r.getUserId());
+                    } else {
+                        double c = pearsonCorrelation(user.getUserId(), r.getUserId());
+                        // transform correlation in similarity
+                        sim = (1 + c) / 2;
+                    }
                     neigh.add(new Neighborhood(r.getUserId(), sim, r.getRating()));
                 } catch (Exception ex) {
                     Logger.getLogger(UserBasedIF.class.getName()).log(Level.SEVERE, null, ex);

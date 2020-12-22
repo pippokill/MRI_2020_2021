@@ -34,29 +34,18 @@ public class RunFiltering {
             int top = 20;
             for (int i = 0; i < top && i < predictions.size(); i++) {
                 Movie movie = (Movie) itemsMap.get(predictions.get(i).getItemid());
-                System.out.println(movie.getTitle() + "\t" + predictions.get(i).getScore());
-            }
-            System.out.println("Time: " + (System.currentTimeMillis() - time));
-
-            userId = "1";
-            predictions = userBased.getPredictions(new User(userId));
-            System.out.println("Recommendations for user " + userId);
-            time = System.currentTimeMillis();
-            itemsMap = IFDatasetUtils.itemListToMap(d.getItems());
-            for (int i = 0; i < top && i < predictions.size(); i++) {
-                Movie movie = (Movie) itemsMap.get(predictions.get(i).getItemid());
-                System.out.println(movie.getTitle() + "\t" + predictions.get(i).getScore());
+                System.out.println(movie.getItemID() + "\t" + movie.getTitle() + "\t" + predictions.get(i).getScore());
             }
             System.out.println("Time: " + (System.currentTimeMillis() - time));
             
-            userId = "2164";
+            ((UserBasedIF) userBased).setCosine(true);
             predictions = userBased.getPredictions(new User(userId));
-            System.out.println("Recommendations for user " + userId);
+            System.out.println("Recommendations for user (with cosine) " + userId);
             time = System.currentTimeMillis();
             itemsMap = IFDatasetUtils.itemListToMap(d.getItems());
             for (int i = 0; i < top && i < predictions.size(); i++) {
                 Movie movie = (Movie) itemsMap.get(predictions.get(i).getItemid());
-                System.out.println(movie.getTitle() + "\t" + predictions.get(i).getScore());
+                System.out.println(movie.getItemID() + "\t" + movie.getTitle() + "\t" + predictions.get(i).getScore());
             }
             System.out.println("Time: " + (System.currentTimeMillis() - time));
         } catch (IOException ex) {
