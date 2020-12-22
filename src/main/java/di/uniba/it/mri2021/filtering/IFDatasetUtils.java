@@ -84,5 +84,13 @@ public class IFDatasetUtils {
         }
         return map;
     }
+    
+    public static Map<String, Integer> ratingsToMapByUser(List<Rating> ratings) {
+        Map<String, Integer> map = new HashMap<>();
+        for (Rating r : ratings) {
+            map.put(r.getUserId(), r.getRating());
+        }
+        return map;
+    }
 
 }
